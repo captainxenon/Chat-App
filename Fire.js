@@ -48,6 +48,7 @@ class Fire {
       _id,
       createdAt,
       text,
+      user,
     };
   };
 
