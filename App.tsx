@@ -1,17 +1,22 @@
-import { createAppContainer } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
+import React, { useEffect } from "react";
+import { View, Text } from "react-native";
+import Navigator from "./Navigator";
 
-import LoginScreen from "./screens/LoginScreen";
-import ChatScreen from "./screens/ChatScreen";
+import firebase from "firebase";
 
-const AppNavigator = createStackNavigator(
-  {
-    Login: LoginScreen,
-    Chat: ChatScreen,
-  },
-  {
-    headerMode: "none",
-  }
-);
-
-export default createAppContainer(AppNavigator);
+export default App = () => {
+  useEffect(() => {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyD7tv4RnE0aXyVQ6zJbuFyqQPhdgjZ44Fo",
+        authDomain: "chat-app-142c8.firebaseapp.com",
+        projectId: "chat-app-142c8",
+        storageBucket: "chat-app-142c8.appspot.com",
+        messagingSenderId: "509041123476",
+        appId: "1:509041123476:web:dce377daea164a90e45481",
+        measurementId: "G-G3LLZXL4X5",
+      });
+    }
+  }, []);
+  return <Navigator></Navigator>;
+};

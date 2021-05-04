@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,48 @@ import {
   Image,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import firebase from "firebase";
+import AuthContext, { AuthContextType } from "../context/AuthContext";
 
-const LoginScreen = ({ navigation }) => {
+interface Props {
+  navigation: any;
+  props: any;
+}
+
+const LoginScreen = ({ navigation, props }: Props) => {
   const [name, setName] = useState("");
+  const user = firebase.auth().currentUser;
 
   const forward = () => {
-    navigation.navigate("Chat", { name: name });
+    firebase
+      .auth()
+      .signInAnonymously()
+      .then(() => {
+        console.log("Signed in as: ", firebase.auth().currentUser);
+        if (name != "") {
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(user!.uid)
+            .set({
+              name: name,
+            })
+            .then(() => {
+              console.log("Document successfully written!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+          navigation.navigate("Chat", { name: name });
+        } else {
+          console.log("Please enter a Name first!");
+        }
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        alert(errorCode + ": " + errorMessage);
+      });
   };
 
   return (
