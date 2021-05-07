@@ -1,22 +1,13 @@
 import firebase from "firebase";
 import React, { useCallback, useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  KeyboardAvoidingView,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import Fire from "../Fire";
 
 interface Props {
   navigation: any;
   _id: string | number;
   text: string;
   createdAt: Date | number;
-  user: User;
   image?: string;
   video?: string;
   audio?: string;
@@ -24,11 +15,10 @@ interface Props {
   sent?: boolean;
   received?: boolean;
   pending?: boolean;
-  quickReplies?: QuickReplies;
 }
 
 const ChatScreen = ({ navigation }: Props) => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any>([]);
 
   const name = navigation.getParam("name");
   useEffect(() => {
@@ -62,7 +52,7 @@ const ChatScreen = ({ navigation }: Props) => {
   }, []);
 
   const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
+    setMessages((previousMessages: any) =>
       GiftedChat.append(previousMessages, messages)
     );
     const { _id, createdAt, text, user } = messages[0];
@@ -74,7 +64,7 @@ const ChatScreen = ({ navigation }: Props) => {
     });
   }, []);
 
-  const chatBubble = (props) => {
+  const chatBubble = (props: any) => {
     return (
       <Bubble
         {...props}

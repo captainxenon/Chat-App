@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import firebase from "firebase";
-import AuthContext, { AuthContextType } from "../context/AuthContext";
 
 interface Props {
   navigation: any;
