@@ -2,6 +2,7 @@ import firebase from "firebase";
 import React, { useCallback, useState, useEffect } from "react";
 import { StyleSheet, SafeAreaView } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { Feather } from "@expo/vector-icons";
 
 interface Props {
   navigation: any;
@@ -19,21 +20,37 @@ interface Props {
 
 const ChatScreen = ({ navigation }: Props) => {
   const [messages, setMessages] = useState<any>([]);
+  const user = firebase.auth().currentUser;
 
-  const name = navigation.getParam("name");
+  const signOut = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        navigation.replace("Login");
+        alert("Signed out successfully!");
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
+
   useEffect(() => {
-    // setMessages([
-    //   {
-    //     _id: 1,
-    //     text: `Hello ${name}`,
-    //     createdAt: new Date(),
-    //     user: {
-    //       _id: 2,
-    //       name: "React Native",
-    //       avatar: "https://placeimg.com/140/140/any",
-    //     },
-    //   },
-    // ]);
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <Feather
+            name="log-out"
+            size={20}
+            style={{ marginRight: 20 }}
+            onPress={signOut}
+          />
+        );
+      },
+    });
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = firebase
       .firestore()
       .collection("chats")
@@ -69,7 +86,8 @@ const ChatScreen = ({ navigation }: Props) => {
       <Bubble
         {...props}
         wrapperStyle={{
-          right: { backgroundColor: "pink", minWidth: 100 },
+          right: { minWidth: 100 },
+          left: { backgroundColor: "lightgreen", minWidth: 100 },
         }}
       ></Bubble>
     );
@@ -83,7 +101,9 @@ const ChatScreen = ({ navigation }: Props) => {
       messages={messages}
       onSend={(messages) => onSend(messages)}
       user={{
-        _id: 1,
+        _id: user?.email,
+        name: user?.displayName,
+        avatar: "https://placeimg.com/140/140/any",
       }}
     />
   );

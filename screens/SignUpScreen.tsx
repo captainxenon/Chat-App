@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import firebase from "firebase";
 
 interface Props {
@@ -14,7 +15,8 @@ interface Props {
   props: any;
 }
 
-const LoginScreen = ({ navigation, props }: Props) => {
+const SignUpScreen = ({ navigation, props }: Props) => {
+  const [fName, setFName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const user = firebase.auth().currentUser;
@@ -22,15 +24,26 @@ const LoginScreen = ({ navigation, props }: Props) => {
   const forward = () => {
     firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
       .then(() => {
         console.log("Signed in as: ", firebase.auth().currentUser);
-        if (email != "" && password != "") {
-          navigation.replace("Chat");
-        } else if (email == "") {
-          console.log("Please enter an Email ID...");
-        } else if (password == "") {
-          console.log("Please enter a valid Password...");
+        if (fName != "") {
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(user!.uid)
+            .set({
+              fName: fName,
+            })
+            .then(() => {
+              console.log("Document successfully written!");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+          navigation.replace("Chat", { fName: fName });
+        } else {
+          console.log("Please enter a Name first!");
         }
       })
       .catch((error) => {
@@ -40,15 +53,20 @@ const LoginScreen = ({ navigation, props }: Props) => {
       });
   };
 
-  const SignUp = () => {
-    navigation.navigate("SignUp");
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.circle} />
       <View style={{ marginHorizontal: 32 }}>
-        <Text style={styles.header}>Chat App</Text>
+        <Text style={styles.header}>Sign Up</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Full Name"
+          onChangeText={(fname) => {
+            setFName(fname);
+          }}
+          value={fName}
+          autoCapitalize="words"
+        />
         <TextInput
           style={styles.input}
           placeholder="Email ID"
@@ -68,12 +86,9 @@ const LoginScreen = ({ navigation, props }: Props) => {
           }}
           value={password}
         />
-        <View style={{ alignItems: "center", marginTop: 64, zIndex: 1 }}>
-          <TouchableOpacity style={styles.button} onPress={forward}>
-            <Text style={styles.textStyle}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={SignUp}>
-            <Text style={styles.textStyle}>Sign Up</Text>
+        <View style={{ alignItems: "flex-end", marginTop: 64 }}>
+          <TouchableOpacity style={styles.forward} onPress={forward}>
+            <Feather name="arrow-right" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -98,6 +113,7 @@ const styles = StyleSheet.create({
   header: {
     fontWeight: "800",
     fontSize: 30,
+    color: "#514e5a",
     marginTop: 50,
     marginBottom: 30,
   },
@@ -110,20 +126,14 @@ const styles = StyleSheet.create({
     color: "#514e5a",
     fontWeight: "600",
   },
-  button: {
-    width: 120,
-    height: 50,
+  forward: {
+    width: 70,
+    height: 70,
+    borderRadius: 70 / 2,
     backgroundColor: "#9075e3",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  textStyle: {
-    fontSize: 18,
-    letterSpacing: 1,
-    color: "#fff",
   },
 });
 
-export default LoginScreen;
+export default SignUpScreen;
